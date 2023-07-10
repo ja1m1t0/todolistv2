@@ -13,7 +13,16 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/todolistDB");
+// mongoose.connect("mongodb://localhost:27017/todolistDB");
+mongoose.connect(
+  `mongodb+srv://jaimeMongo:m0n90D8Pwd001@cluster0.qo4sa7n.mongodb.net/?retryWrites=true&w=majority`
+);
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error: "));
+db.once("open", function () {
+  console.log("Connected successfully");
+});
 
 const itemsSchema = {
   name: String,
@@ -91,7 +100,6 @@ app.get("/c/:customListName", function (req, res) {
           listTitle: item.name,
           newListItems: item.items,
         });
-
       }
     })
     .catch(function (err) {

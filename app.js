@@ -41,8 +41,12 @@ const listSchema = {
 const List = mongoose.model("List", listSchema);
 
 app.get("/", function (req, res) {
+  console.log("In main route");
+
   Item.find()
     .then(function (items) {
+      console.log(items);
+
       if (items.length === 0) {
         Item.insertMany(defaultItems)
           .then(function () {
@@ -51,50 +55,54 @@ app.get("/", function (req, res) {
           .catch(function (err) {
             console.log(err);
           });
+        res.redirect("/");
+      } else {
+        res.render("list", { listTitle: "Today", newListItems: items });
       }
-      res.render("list", { listTitle: "Today", newListItems: items });
     })
     .catch(function (err) {
       console.log(err);
     });
 });
 
-app.get("/:customListName", function (req, res) {
+app.get("/c/:customListName", function (req, res) {
   const customListName = _.capitalize(req.params.customListName);
-  
+
+  // const checkIt = List.findOne({ name: customListName });
+
+  console.log(customListName);
+
   List.findOne({ name: customListName })
     .then(function (item) {
-      if (item === null) {
+      // console.log(item);
+
+      if (item === null || item.name !== customListName) {
         const list = new List({
           name: customListName,
           items: defaultItems,
         });
         list.save();
-        res.redirect("/" + customListName);
-      } else {
+        res.redirect("/c/" + customListName);
+      } else if (item.name === customListName) {
         // console.log("Does not exist");
-        if (item.name === customListName) {
-          console.log("Exists!");
-          res.render("list", {
-            listTitle: item.name,
-            newListItems: item.items,
-          });
-        }
-        // } else {
-        //   console.log("Doesn't exist!");
-        // }
+        console.log("Exists!");
+
+        res.render("list", {
+          listTitle: item.name,
+          newListItems: item.items,
+        });
+
       }
     })
     .catch(function (err) {
       console.log(err);
     });
 
-  const list = new List({
-    name: customListName,
-    items: defaultItems,
-  });
-
-  list.save();
+  // const list = new List({
+  //   name: customListName,
+  //   items: defaultItems,
+  // });
+  // list.save();
 });
 
 app.post("/", function (req, res) {
@@ -112,7 +120,7 @@ app.post("/", function (req, res) {
     List.findOne({ name: listName }).then(function (list) {
       list.items.push(item);
       list.save();
-      res.redirect("/" + listName);
+      res.redirect("/c/" + listName);
     });
   }
 });
@@ -135,7 +143,7 @@ app.post("/delete", function (req, res) {
       { name: listName },
       { $pull: { items: { _id: checkedItemId } } }
     ).then(function (list) {
-      res.redirect("/" + listName);
+      res.redirect("/c/" + listName);
     });
   }
 });

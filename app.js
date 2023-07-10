@@ -45,7 +45,7 @@ app.get("/", function (req, res) {
 
   Item.find()
     .then(function (items) {
-      console.log(items);
+      // console.log(items);
 
       if (items.length === 0) {
         Item.insertMany(defaultItems)
@@ -97,12 +97,6 @@ app.get("/c/:customListName", function (req, res) {
     .catch(function (err) {
       console.log(err);
     });
-
-  // const list = new List({
-  //   name: customListName,
-  //   items: defaultItems,
-  // });
-  // list.save();
 });
 
 app.post("/", function (req, res) {

@@ -154,6 +154,9 @@ app.get("/about", function (req, res) {
   res.render("about");
 });
 
-app.listen(3000, function () {
-  console.log("Server started on port 3000");
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, function () {
+  console.log(`Server started on port ${PORT}`);
 });
+
